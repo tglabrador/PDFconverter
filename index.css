@@ -1,11 +1,27 @@
 @import "tailwindcss";
 @import "primeicons/primeicons.css";
 
+@keyframes slide-in {
+  from {
+    transform: translateX(100px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease;
+}
+
 :root {
   --primary: #2563eb;
   --primary-dark: #1d4ed8;
-  --sidebar-bg: #f8f9ff;
-  --sidebar-width: 190px;
+  --topbar-bg: #f8f9ff;
+  --topbar-width: 190px;
 }
 
 body {
@@ -14,7 +30,7 @@ body {
   margin: 0;
 }
 
-.sidebar-item {
+.topbar-item {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -22,29 +38,29 @@ body {
   border-radius: 8px;
   cursor: pointer;
   font-size: 15px;
-  color: #4b5563;
+  color: #000000;
   transition: background 0.15s;
   text-decoration: none;
 }
 
-.sidebar-item:hover,
-.sidebar-item.active {
+.topbar-item:hover,
+.topbar-item.active {
   background: #e0e7ff;
-  color: #2563eb;
+  color: #1d49a7;
 }
 
-.sidebar-sub-item {
+.topbar-sub-item {
   padding: 6px 16px 6px 32px;
   font-size: 12.5px;
-  color: #6b7280;
+  color: #000000;
   cursor: pointer;
   border-radius: 6px;
   transition: background 0.15s;
 }
 
-.sidebar-sub-item:hover {
+.topbar-sub-item:hover {
   background: #eff6ff;
-  color: #2563eb;
+  color: #1d49a7;
 }
 
 .tool-card {
