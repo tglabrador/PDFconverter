@@ -9,7 +9,7 @@ export default function Login({ onNavigate, onLogin }) {
 
     const handleLogin = (e) => {
         e.preventDefault();
-        onLogin({ name: email.split('@')[0], email: email, photo: null });
+        onLogin({ name: email.split('@')[0], photo: null });
         onNavigate('dashboard');
     };
 
@@ -17,23 +17,20 @@ export default function Login({ onNavigate, onLogin }) {
         <div className="min-h-screen bg-[#f0f4ff] flex flex-col">
 
             {/* Topbar */}
-            <header className="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-10">
+            <header className="h-16 bg-white border-b border-gray-500 flex items-center justify-between px-6 gap-6 py-4 pr-10">
                 <div
                     className="flex items-center gap-2 cursor-pointer"
                     onClick={() => onNavigate('dashboard')}
                 >
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                        <FileText size={16} className="text-white" />
+                    <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <FileText size={18} className="text-white" />
                     </div>
                     <span className="font-bold text-gray-900 text-lg">DocuShift</span>
                 </div>
-                <nav className="flex items-center gap-8">
-                    <a className="text-sm text-gray-600 hover:text-blue-600 cursor-pointer">Tools</a>
+                <nav className="flex items-center gap-6 ml-auto">
                     <a className="text-sm text-gray-600 hover:text-blue-600 cursor-pointer">Pricing</a>
                     <a className="text-sm font-semibold text-blue-600 border-b-2 border-blue-600 pb-0.5 cursor-pointer">Login</a>
-                    <button className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2 rounded-lg transition">
-                        Sign Up
-                    </button>
+                    <button type="button" onClick={() => onNavigate('signup')} className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-1.5 rounded-lg transition cursor-pointer">Sign Up</button>
                 </nav>
             </header>
 
@@ -122,7 +119,7 @@ export default function Login({ onNavigate, onLogin }) {
                         <div className="flex gap-3">
                             <button
                                 type="button"
-                                className="flex-1 flex items-center justify-center gap-2 border border-gray-300 rounded-xl py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
+                                className="flex-1 flex items-center justify-center gap-2 border border-gray-300 rounded-xl py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer"
                             >
                                 <svg width="16" height="16" viewBox="0 0 24 24">
                                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -134,7 +131,7 @@ export default function Login({ onNavigate, onLogin }) {
                             </button>
                             <button
                                 type="button"
-                                className="flex-1 flex items-center justify-center gap-2 border border-gray-300 rounded-xl py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
+                                className="flex-1 flex items-center justify-center gap-2 border border-gray-300 rounded-xl py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer"
                             >
                                 <svg width="16" height="16" viewBox="0 0 24 24">
                                     <path fill="#F25022" d="M1 1h10v10H1z" />
@@ -149,7 +146,7 @@ export default function Login({ onNavigate, onLogin }) {
                         {/* Sign up link */}
                         <p className="text-center text-sm text-gray-500 mt-1">
                             Don't have an account?{' '}
-                            <a className="text-blue-600 font-semibold hover:text-blue-800 cursor-pointer">Sign up</a>
+                            <a className="text-blue-600 font-semibold hover:text-blue-800 cursor-pointer" onClick={() => onNavigate('signup')}>Sign up</a>
                         </p>
 
                     </form>
