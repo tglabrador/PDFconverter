@@ -9,6 +9,8 @@ import {
 } from 'lucide-react';
 import Login from './Login.jsx';
 import Signup from './Signup.jsx';
+import MergePDF from './MergePDF.jsx';
+import Layout from './Layout.jsx';
 
 const categories = ['All', 'Organize PDF', 'Optimize PDF', 'Convert PDF', 'Edit PDF', 'PDF Security', 'PDF Intelligence'];
 
@@ -45,120 +47,6 @@ const tools = [
   { name: 'AI Summarizer', desc: 'Extract key insights from long PDF documents instantly.', category: 'PDF Intelligence', bg: 'bg-indigo-100', icon: '🤖' },
   { name: 'Translate PDF', desc: 'Translate your PDF documents to any language instantly.', category: 'PDF Intelligence', bg: 'bg-indigo-100', icon: '🌍' },
 ];
-
-const topbarSections = [
-  { label: 'ORGANIZE PDF', key: 'organize', items: ['Merge PDF', 'Split PDF', 'Remove Pages', 'Extract Pages', 'Organize PDF', 'Scan to PDF'] },
-  { label: 'OPTIMIZE PDF', key: 'optimize', items: ['Compress PDF', 'Repair PDF', 'OCR PDF'] },
-  { label: 'CONVERT TO PDF', key: 'convertTo', items: ['JPG to PDF', 'PNG to PDF', 'Word to PDF', 'Excel to PDF', 'PowerPoint to PDF', 'HTML to PDF'] },
-  { label: 'CONVERT FROM PDF', key: 'convertFrom', items: ['PDF to JPG', 'PDF to Word', 'PDF to Excel', 'PDF to PowerPoint', 'PDF to PDF/A'] },
-  { label: 'EDIT PDF', key: 'edit', items: ['Rotate PDF', 'Add page numbers', 'Add watermark', 'Crop PDF', 'Edit PDF', 'PDF Forms'] },
-  { label: 'PDF SECURITY', key: 'security', items: ['Unlock PDF', 'Protect PDF', 'Sign PDF', 'Redact PDF', 'Compare PDF'] },
-  { label: 'PDF INTELLIGENCE', key: 'intelligence', items: ['AI Summarizer', 'Translate PDF'] },
-];
-
-function Topbar({ onNavigate, user, setUser, collapsed, setCollapsed }) {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [open, setOpen] = useState({});
-  const toggle = (key) => setOpen(p => ({ ...p, [key]: !p[key] }));
-
-  return (
-    <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-500 flex items-center px-6 gap-4 z-20">
-
-      {/* Hamburger + Dropdown */}
-      <div className="relative">
-        <button
-          onClick={() => setCollapsed(prev => !prev)}
-          className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shadow-md hover:bg-blue-700 transition"
-        >
-          <Menu size={18} className="text-white" />
-        </button>
-
-        {!collapsed && (
-          <div className="absolute top-12 left-0 w-[280px] bg-blue-200 border border-gray-500 rounded-2xl shadow-xl overflow-y-auto max-h-[80vh] flex flex-col">
-            <div className="flex items-center gap-2 px-4 py-4 border-b border-gray-500">
-              <div className="w-8 h-8 bg-blue-800 rounded-lg flex items-center justify-center">
-                <button className="cursor-pointer" onClick={() => window.location.reload()}>
-                  <FileText size={20} className="text-white" />
-                </button>
-              </div>
-              <div>
-                <div className="font-bold text-sm text-gray-900">DocuShift</div>
-                <div className="text-[11px] text-gray-500">Document Utility</div>
-              </div>
-            </div>
-            <nav className="flex-1 px-4 py-5 flex flex-col gap-2">
-              <a className="topbar-item font-semibold"><Files size={25} /> Documents</a>
-              <div className="mt-3 mb-1 px-3 text-[15px] font-semibold text-black tracking-wider flex items-center gap-2">
-                <Wrench size={25} className="text-black" /> TOOLS TOOLKIT
-              </div>
-              {topbarSections.map(sec => (
-                <div key={sec.key}>
-                  <div className="topbar-item justify-between" onClick={() => sec.items.length && toggle(sec.key)}>
-                    <span className="px-4 text-[12px] font-semibold text-black tracking-wide">{sec.label}</span>
-                    {sec.items.length > 0 && (open[sec.key] ? <ChevronUp size={15} /> : <ChevronDown size={15} />)}
-                  </div>
-                  {open[sec.key] && sec.items.map(item => (
-                    <div key={item} className="topbar-sub-item ">{item}</div>
-                  ))}
-                </div>
-              ))}
-            </nav>
-            <div className="px-2 pb-4 flex flex-col gap-4">
-              <a className="topbar-item font-semibold"><Settings size={25} /> Settings</a>
-              <a className="topbar-item font-semibold"><History size={25} /> History</a>
-              <div className="mx-2 mt-2 rounded-xl bg-blue-600 p-5 text-white">
-                <div className="text-[10px] font-bold tracking-widest mb-1 opacity-80">PRO PLAN</div>
-                <p className="text-[11px] mb-2 opacity-90">Upgrade for unlimited batch processing.</p>
-                <button className="w-full bg-white text-blue-600 font-bold text-xs py-1.5 rounded-lg hover:bg-blue-50 transition">Upgrade</button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Right side options */}
-      <div className="flex items-center gap-6 ml-auto">
-        <button className="text-sm text-gray-600 hover:text-blue-600 cursor-pointer">Pricing</button>
-        {user ? (
-          <div className="relative">
-            <div
-              className="flex items-center rounded-lg px-1 py-1.5 hover:border-blue-400 transition cursor-pointer"
-              onClick={() => setDropdownOpen(prev => !prev)}
-            >
-              {user.photo ? (
-                <img src={user.photo} alt="Profile" className="w-10 h-10 rounded-full object-cover" />
-              ) : (
-                <div className="w-10 h-10 rounded-full bg-blue-800 text-white flex items-center justify-center font-bold text-sm">
-                  {user.name[0].toUpperCase()}
-                </div>
-              )}
-              <span className="text-sm text-gray-700">{user.email}</span>
-            </div>
-            {dropdownOpen && (
-              <div className="absolute right-0 w-25 bg-white border border-gray-200 rounded-xl shadow-lg z-40 overflow-hidden">
-                <div className="flex items-center gap-2 px-4 py-2.5 hover:bg-gray-50 cursor-pointer transition" onClick={() => { setDropdownOpen(false); }}>
-
-                  <span className="text-sm text-gray-700">Settings</span>
-                </div>
-                <div
-                  className="flex items-center px-4 py-2.5 hover:bg-red-50 cursor-pointer transition"
-                  onClick={() => { setUser(null); setDropdownOpen(false); window.location.reload(); }}
-                >
-                  <a className="text-sm text-red-500 font-small">Logout</a>
-                </div>
-              </div>
-            )}
-          </div>
-        ) : (
-          <button className="text-sm text-gray-600 hover:text-blue-600 cursor-pointer" onClick={() => onNavigate('login')}>Login</button>
-        )}
-        {!user && (
-          <button className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-1.5 rounded-lg transition" onClick={() => onNavigate('signup')}>Sign Up</button>
-        )}
-      </div>
-    </header>
-  );
-}
 
 function ActivityInsights() {
   return (
@@ -263,71 +151,59 @@ export default function App({ onNavigate }) {
     : tools.filter(t => t.category === activeCategory);
 
   const handleToolClick = (tool) => {
-    // Option 1: navigate to another page in your app
-    // onNavigate('toolpage');
-
-    // Option 2: open an external URL
-    // window.open('https://example.com', '_blank');
-
-    alert(`You clicked: ${tool.name}`);
+    if (tool.name === 'Merge PDF') { setPage('mergepdf'); }
   };
 
   if (page === 'login') return <Login onNavigate={setPage} onLogin={setUser} />;
   if (page === 'signup') return <Signup onNavigate={setPage} onSignup={setUser} />;
+  if (page === 'mergepdf') return <MergePDF onNavigate={setPage} user={user} setUser={setUser} />;
 
   return (
-    <div className="min-h-screen bg-[#f5f6fa]">
-      <Topbar onNavigate={setPage} user={user} setUser={setUser} collapsed={collapsed} setCollapsed={setCollapsed} />
-      <main className="pt-24 p-8 min-h-screen">
-        {/* Header */}
-        <div className="text-center mb-10">
-          <h1 className="text-5xl font-bold text-gray-800 mb-4">All the tools you need for working with PDFs, gathered in one place</h1>
-          <p className="text-gray-500 max-w-5xl mx-auto">All the tools you need to use PDFs, at your fingertips. All are easy to use! Merge, split, compress, convert, rotate, unlock and watermark PDFs with just a few clicks.</p>
-        </div>
+    <Layout onNavigate={setPage} user={user} setUser={setUser}>
+      <div className="min-h-screen bg-[#f5f6fa]">
+        <main className="pt-24 p-8 min-h-screen">
+          {/* Header */}
+          <div className="text-center mb-10">
+            <h1 className="text-5xl font-bold text-gray-800 mb-4">All the tools you need for working with PDFs, gathered in one place</h1>
+            <p className="text-gray-500 max-w-5xl mx-auto">All the tools you need to use PDFs, at your fingertips. All are easy to use! Merge, split, compress, convert, rotate, unlock and watermark PDFs with just a few clicks.</p>
+          </div>
 
-        {/* Category Filter */}
-        <div className="flex flex-wrap justify-center gap-4 mb-10">
-          {categories.map(cat => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition border ${activeCategory === cat
-                ? 'bg-gray-900 text-white border-gray-900'
-                : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
-                }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
+          {/* Category Filter */}
+          <div className="flex flex-wrap justify-center gap-4 mb-10">
+            {categories.map(cat => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition border ${activeCategory === cat
+                  ? 'bg-gray-900 text-white border-gray-900'
+                  : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
+                  }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
 
-        {/* Tool Cards Grid */}
-        <div className="grid grid-cols-6 gap-5">
-          {filtered.map((tool, i) => (
-            <div
-              key={i}
-              onClick={() => handleToolClick(tool)}
-              className="bg-white border border-gray-300 rounded-2xl p-5 cursor-pointer hover:shadow-md hover:border-blue-300 transition flex flex-col gap-3"
-            >
-              <div className={`w-12 h-12 ${tool.bg} rounded-xl flex items-center justify-center text-3xl`}>
-                {tool.icon}
+          {/* Tool Cards Grid */}
+          <div className="grid grid-cols-6 gap-5">
+            {filtered.map((tool, i) => (
+              <div
+                key={i}
+                onClick={() => handleToolClick(tool)}
+                className="bg-white border border-gray-300 rounded-2xl p-5 cursor-pointer hover:shadow-md hover:border-blue-300 transition flex flex-col gap-3"
+              >
+                <div className={`w-12 h-12 ${tool.bg} rounded-xl flex items-center justify-center text-3xl`}>
+                  {tool.icon}
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900 text-sm mb-1">{tool.name}</p>
+                  <p className="text-xs text-gray-700 leading-relaxed">{tool.desc}</p>
+                </div>
               </div>
-              <div>
-                <p className="font-semibold text-gray-900 text-sm mb-1">{tool.name}</p>
-                <p className="text-xs text-gray-700 leading-relaxed">{tool.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </main>
-      <footer className="border-t border-gray-200 bg-white px-8 py-8 flex items-center justify-between text-xs text-gray-400">
-        <span>© 2024 DocuShift Inc.</span>
-        <div className="flex gap-5">
-          <a className="hover:text-gray-600 cursor-pointer">Privacy Policy</a>
-          <a className="hover:text-gray-600 cursor-pointer">Terms of Service</a>
-          <a className="hover:text-gray-600 cursor-pointer">Security</a>
-        </div>
-      </footer>
-    </div>
+            ))}
+          </div>
+        </main>
+      </div>
+    </Layout>
   );
 }
