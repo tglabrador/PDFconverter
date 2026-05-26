@@ -203,7 +203,7 @@ export default function PDFtoJsonTxt({ onNavigate, user, setUser }) {
                 </button>
                 <div className="flex flex-col gap-1 justify-center text-center">
                     <h1 className="text-4xl font-bold text-gray-900">Extract PDF to JSON / TXT</h1>
-                    <p className="text-sm text-gray-500 mt-1">Parse dense real estate agreements into readable plaintext files or object key-value maps.</p>
+                    <p className="text-sm text-gray-500 mt-1">Regex parsing and Named Entity Recognition (NER) models mapped to real estate datasets.</p>
                 </div>
             </div>
 
