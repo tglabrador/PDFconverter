@@ -7,9 +7,9 @@ import {
 const toolsList = [
     { label: 'PDF to Word', key: 'pdfToWord' },
     { label: 'PDF to Excel', key: 'pdfToExcel' },
-    { label: 'PDF to JPG', key: 'pdfToJpg' },
-    { label: 'PDF to DXF', key: 'pdfToDxf' },
-    { label: 'PDF to TXT', key: 'pdfToTxt' }
+    { label: 'PDF to IMG', key: 'pdfToImg' },
+    { label: 'PDF to DXF/DWG(CAD)', key: 'pdfToCad' },
+    { label: 'PDF to JSON/TXT', key: 'pdfToJsonTxt' }
 ];
 
 export default function Layout({ children, onNavigate, user, setUser }) {
@@ -40,19 +40,19 @@ export default function Layout({ children, onNavigate, user, setUser }) {
 
                     {/* Sidebar Drawer Menu Panel */}
                     {!collapsed && (
-                        <div className="absolute top-12 left-0 w-[280px] bg-white border border-gray-200 rounded-2xl shadow-xl overflow-y-auto max-h-[80vh] flex flex-col z-50">
+                        <div className="absolute top-12 left-0 w-[280px] bg-white border border-gray-300 rounded-2xl shadow-xl overflow-y-auto max-h-[80vh] flex flex-col z-50">
 
                             {/* Logo Group (Clicking brand redirects home cleanly) */}
                             <div
-                                className="flex items-center gap-2 px-4 py-4 border-b border-gray-100 cursor-pointer select-none"
+                                className="flex items-center gap-3 px-4 py-4 border-b border-gray-100 cursor-pointer select-none"
                                 onClick={() => handleNavigation('dashboard')}
                             >
-                                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                                    <FileText size={18} className="text-white" />
+                                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                                    <FileText size={24} className="text-white" />
                                 </div>
                                 <div>
-                                    <div className="font-bold text-sm text-gray-900">DocuShift</div>
-                                    <div className="text-[11px] text-gray-500">Document Utility</div>
+                                    <div className="font-bold text-2sm text-gray-900">DeedFlow</div>
+                                    <div className="text-[12px] text-gray-600">Real Estate Document Utility</div>
                                 </div>
                             </div>
 
@@ -63,10 +63,10 @@ export default function Layout({ children, onNavigate, user, setUser }) {
                                     className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-gray-50 cursor-pointer text-gray-700 hover:text-blue-600 transition font-semibold text-sm"
                                 >
                                     <div className="flex items-center gap-2.5">
-                                        <Wrench size={18} />
+                                        <Wrench size={24} />
                                         <span>Tools Toolkit</span>
                                     </div>
-                                    {toolsOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                    {toolsOpen ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
                                 </div>
 
                                 {toolsOpen && (
@@ -90,13 +90,13 @@ export default function Layout({ children, onNavigate, user, setUser }) {
                                     onClick={() => handleNavigation('settings')}
                                     className="flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-xl text-left w-full cursor-pointer transition"
                                 >
-                                    <Settings size={18} /> Settings
+                                    <Settings size={24} /> Settings
                                 </button>
                                 <button
                                     onClick={() => handleNavigation('history')}
                                     className="flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-xl text-left w-full cursor-pointer transition"
                                 >
-                                    <History size={18} /> History
+                                    <History size={24} /> History
                                 </button>
                             </div>
                         </div>
@@ -142,7 +142,7 @@ export default function Layout({ children, onNavigate, user, setUser }) {
 
             {/* ── FOOTER ── */}
             <footer className="border-t border-gray-200 bg-white px-8 py-6 flex items-center justify-between text-xs text-gray-400">
-                <span>© 2026 DocuShift Inc.</span>
+                <span>© 2026 DeedFlow Inc.</span>
             </footer>
 
         </div>
