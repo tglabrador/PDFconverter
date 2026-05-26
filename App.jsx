@@ -4,6 +4,9 @@ import Login from './Login.jsx';
 import Signup from './Signup.jsx';
 import PDFtoWord from './PDFtoWord.jsx';
 import PDFtoExcel from './PDFtoExcel.jsx';
+import PDFtoIMG from './PDFtoIMG.jsx';
+import PDFtoCad from './PDFtoCad.jsx';
+import PDFtoJsonTxt from './PDFtoJsonTxt.jsx';
 
 import Layout from './Layout.jsx';
 
@@ -11,9 +14,9 @@ const tools = [
   // Organize PDF
   { name: 'PDF to Word', desc: 'Convert text elements while maintaining tabular margins for signature pages and legal fields.', category: 'Convert PDF', bg: 'bg-blue-100', icon: '📝' },
   { name: 'PDF to Excel', desc: 'Pull data straight from PDFs into Excel spreadsheets in a few short seconds.', category: 'Convert PDF', bg: 'bg-green-100', icon: '📈' },
-  { name: 'PDF to JPG', desc: 'Turn your PDF pages into high-quality JPG images with just a few clicks.', category: 'Convert PDF', bg: 'bg-pink-100', icon: '🖼️' },
+  { name: 'PDF to IMG', desc: 'Turn your PDF pages into high-quality JPG images with just a few clicks.', category: 'Convert PDF', bg: 'bg-pink-100', icon: '🖼️' },
   { name: 'PDF to DXF/DWG(CAD)', desc: 'Convert your PDF drawings into CAD formats for easy editing and use in design software.', category: 'Convert PDF', bg: 'bg-yellow-100', icon: '📐' },
-  { name: 'PDF to Json/TXT', desc: 'Extract text and data from PDFs into JSON or TXT formats for easy analysis and use.', category: 'Convert PDF', bg: 'bg-purple-100', icon: '📄' },
+  { name: 'PDF to Json/Txt', desc: 'Extract text and data from PDFs into JSON or TXT formats for easy analysis and use.', category: 'Convert PDF', bg: 'bg-purple-100', icon: '📄' },
 ];
 
 export default function App() {
@@ -33,6 +36,15 @@ export default function App() {
     if (tool.name === 'PDF to Excel') {
       setPage('pdfToExcel');
     }
+    if (tool.name === 'PDF to IMG') {
+      setPage('pdfToImg');
+    }
+    if (tool.name === 'PDF to DXF/DWG(CAD)') {
+      setPage('pdfToCad');
+    }
+    if (tool.name === 'PDF to Json/Txt') {
+      setPage('pdfToJsonTxt');
+    }
   };
 
   // Auth screen overrides
@@ -49,6 +61,21 @@ export default function App() {
     if (page === 'pdfToExcel') {
       return (
         <PDFtoExcel onNavigate={setPage} user={user} setUser={setUser} />
+      );
+    }
+    if (page === 'pdfToImg') {
+      return (
+        <PDFtoIMG onNavigate={setPage} user={user} setUser={setUser} />
+      );
+    }
+    if (page === 'pdfToCad') {
+      return (
+        <PDFtoCad onNavigate={setPage} user={user} setUser={setUser} />
+      );
+    }
+    if (page === 'pdfToJsonTxt') {
+      return (
+        <PDFtoJsonTxt onNavigate={setPage} user={user} setUser={setUser} />
       );
     }
 
