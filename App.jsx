@@ -3,6 +3,8 @@ import './index.css';
 import Login from './Login.jsx';
 import Signup from './Signup.jsx';
 import PDFtoWord from './PDFtoWord.jsx';
+import PDFtoExcel from './PDFtoExcel.jsx';
+
 import Layout from './Layout.jsx';
 
 const tools = [
@@ -25,9 +27,11 @@ export default function App() {
     : tools.filter(t => t.category === activeCategory);
 
   const handleToolClick = (tool) => {
-    // 🟩 CHANGED: Changed 'PDFtoWord' to 'pdfToWord' to match your Layout file perfectly
     if (tool.name === 'PDF to Word') {
       setPage('pdfToWord');
+    }
+    if (tool.name === 'PDF to Excel') {
+      setPage('pdfToExcel');
     }
   };
 
@@ -37,10 +41,14 @@ export default function App() {
 
   // Dynamic Content Switcher
   const renderMainContent = () => {
-    // 🟩 CHANGED: Matches lowercase 'pdfToWord' coming from your untouched Layout sidebar
     if (page === 'pdfToWord') {
       return (
         <PDFtoWord onNavigate={setPage} user={user} setUser={setUser} />
+      );
+    }
+    if (page === 'pdfToExcel') {
+      return (
+        <PDFtoExcel onNavigate={setPage} user={user} setUser={setUser} />
       );
     }
 
