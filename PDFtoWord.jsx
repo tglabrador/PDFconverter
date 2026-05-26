@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './index.css';
 import { FileText, HardDrive, Upload, Download } from 'lucide-react';
-import Layout from './Layout';
 
 function PDFThumbnail({ file }) {
     const [thumbnail, setThumbnail] = useState(null);
@@ -197,12 +196,14 @@ export default function PDFtoWord({ onNavigate, user, setUser }) {
             <div>
                 <button
                     onClick={() => onNavigate('dashboard')}
-                    className="text-sm hover:underline text-blue-800 mb-6 flex gap-1 cursor-pointer"
+                    className="text-5sm hover:underline text-blue-800 mb-6 flex gap-1 cursor-pointer"
                 >
                     ← Back to Dashboard
                 </button>
-                <h1 className="text-2xl font-bold text-gray-900">Convert PDF to Word</h1>
-                <p className="text-sm text-gray-500 mt-1">Convert your PDF files to editable Word documents.</p>
+                <div className="flex flex-col gap-1 justify-center text-center" >
+                    <h1 className="text-4xl font-bold text-gray-900">Convert PDF to Word</h1>
+                    <p className="text-sm text-gray-500 mt-1">Convert text elements while maintaining tabular margins for signature pages and legal fields.</p>
+                </div>
             </div>
 
             {/* Upload Zone (Pass progress and setProgress down as props) */}
@@ -243,7 +244,7 @@ export default function PDFtoWord({ onNavigate, user, setUser }) {
                                 </div>
                             </div>
                             <button className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-semibold px-2 py-2 rounded-lg transition">
-                                <Download size={16} />
+                                <Download size={18} />
                             </button>
                         </div>
                     ))}
