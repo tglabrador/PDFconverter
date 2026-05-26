@@ -43,39 +43,36 @@ function PDFThumbnail({ file }) {
     );
 }
 
-function UploadZone({ files, setFiles }) {
+function UploadZone({ files, setFiles, progress, setProgress }) {
     const [dragging, setDragging] = useState(false);
-    const [progress, setProgress] = useState({});
-    const [sortOrder, setSortOrder] = useState('none');
 
     const handleFiles = (incoming) => {
-        const arr = Array.from(incoming);
-        setFiles(prev => [...prev, ...arr]);
-        arr.forEach((file) => {
-            const id = `${file.name}-${file.size}`;
-            setProgress(prev => ({ ...prev, [id]: 0 }));
-            const duration = Math.min(Math.max(file.size / 100000 * 1000, 800), 5000);
-            const steps = 20;
-            const interval = duration / steps;
-            let step = 0;
-            const timer = setInterval(() => {
-                step++;
-                const pct = Math.min(Math.round((step / steps) * 100), 100);
-                setProgress(prev => ({ ...prev, [id]: pct }));
-                if (step >= steps) clearInterval(timer);
-            }, interval);
-        });
+        if (!incoming || incoming.length === 0) return;
+
+        const file = incoming[0];
+        setFiles([file]);
+
+        const id = `${file.name}-${file.size}`;
+        setProgress({ [id]: 0 });
+
+        const duration = Math.min(Math.max(file.size / 100000 * 1000, 800), 5000);
+        const steps = 20;
+        const interval = duration / steps;
+        let step = 0;
+
+        const timer = setInterval(() => {
+            step++;
+            const pct = Math.min(Math.round((step / steps) * 100), 100);
+            setProgress(prev => ({ ...prev, [id]: pct }));
+            if (step >= steps) clearInterval(timer);
+        }, interval);
     };
 
-    const removeFile = (index) => {
-        setFiles(prev => prev.filter((_, i) => i !== index));
+    const removeFile = () => {
+        setFiles([]);
+        setProgress({});
     };
 
-    const sortedFiles = [...files].sort((a, b) => {
-        if (sortOrder === 'az') return a.name.localeCompare(b.name);
-        if (sortOrder === 'za') return b.name.localeCompare(a.name);
-        return 0;
-    });
 
     return (
         <div className="flex flex-col gap-4">
@@ -87,7 +84,6 @@ function UploadZone({ files, setFiles }) {
             >
                 <input
                     type="file"
-                    multiple
                     accept=".pdf"
                     className="hidden"
                     onChange={e => handleFiles(e.target.files)}
@@ -96,13 +92,13 @@ function UploadZone({ files, setFiles }) {
                     <Upload size={26} className="text-blue-600" />
                 </div>
                 <div className="text-center">
-                    <p className="font-semibold text-gray-800">Upload your PDF files</p>
-                    <p className="text-sm text-gray-500 mt-1">Drag and drop files here or click to browse</p>
+                    <p className="font-semibold text-gray-800">Upload your PDF file</p>
+                    <p className="text-sm text-gray-500 mt-1">Drag and drop file here or click to browse</p>
                     <p className="text-xs text-gray-400 mt-1">Supports PDF only</p>
                 </div>
                 <div className="flex gap-3 mt-1">
                     <div className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2 rounded-lg transition">
-                        <span className="text-lg font-light leading-none">+</span> Select Files
+                        <span className="text-lg font-light leading-none">+</span> Select File
                     </div>
                     <div className="flex items-center gap-2 border border-gray-300 text-gray-700 text-sm font-medium px-5 py-2 rounded-lg hover:bg-gray-50 transition">
                         <HardDrive size={15} /> From Google Drive
@@ -113,52 +109,30 @@ function UploadZone({ files, setFiles }) {
             {files.length > 0 && (
                 <div className="bg-white rounded-2xl border border-gray-200 p-4 flex flex-col gap-4">
                     <div className="flex items-center justify-between">
-                        <p className="text-sm font-semibold text-gray-700">
-                            {files.length} file{files.length > 1 ? 's' : ''} selected
-                        </p>
-                        <div className="flex items-center gap-3">
-                            <div className="flex items-center gap-1 border border-gray-200 rounded-lg overflow-hidden">
-                                <button
-                                    onClick={() => setSortOrder(sortOrder === 'az' ? 'none' : 'az')}
-                                    className={`px-3 py-1.5 text-xs font-medium transition ${sortOrder === 'az' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-50'}`}
-                                >
-                                    A→Z
-                                </button>
-                                <button
-                                    onClick={() => setSortOrder(sortOrder === 'za' ? 'none' : 'za')}
-                                    className={`px-3 py-1.5 text-xs font-medium transition ${sortOrder === 'za' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-50'}`}
-                                >
-                                    Z→A
-                                </button>
-                            </div>
-                            <button
-                                onClick={() => { setFiles([]); setProgress({}); }}
-                                className="text-xs text-red-400 hover:text-red-600 transition"
-                            >
-                                Remove all
-                            </button>
-                        </div>
+                        <p className="text-sm font-semibold text-gray-700">Selected File</p>
+                        <button
+                            onClick={removeFile}
+                            className="text-xs text-red-400 hover:text-red-600 transition"
+                        >
+                            Remove file
+                        </button>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-4">
-                        {sortedFiles.map((file, i) => {
+                    <div className="max-w-sm mx-auto w-full">
+                        {files.map((file, i) => {
                             const id = `${file.name}-${file.size}`;
                             const pct = progress[id] ?? 0;
                             const done = pct === 100;
-                            const originalIndex = files.indexOf(file);
                             return (
                                 <div key={i} className="flex flex-col border border-gray-200 rounded-xl overflow-hidden relative group shadow-sm">
-                                    {/* PDF Thumbnail */}
                                     <div className="relative">
                                         <PDFThumbnail file={file} />
-                                        {/* Remove button */}
                                         <button
-                                            onClick={e => { e.preventDefault(); removeFile(originalIndex); }}
+                                            onClick={e => { e.preventDefault(); removeFile(); }}
                                             className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full text-xs items-center justify-center hidden group-hover:flex"
                                         >
                                             ✕
                                         </button>
-                                        {/* Progress bar */}
                                         {!done && (
                                             <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-200">
                                                 <div
@@ -173,7 +147,6 @@ function UploadZone({ files, setFiles }) {
                                             </div>
                                         )}
                                     </div>
-                                    {/* File name */}
                                     <div className="px-3 py-2 bg-white">
                                         <p className="text-xs font-medium text-gray-800 truncate">{file.name}</p>
                                         <p className="text-[10px] text-gray-400 mt-0.5">{(file.size / 1024).toFixed(1)} KB</p>
@@ -188,77 +161,97 @@ function UploadZone({ files, setFiles }) {
     );
 }
 
-export default function MergePDF({ onNavigate, user, setUser }) {
+export default function PDFtoWord({ onNavigate, user, setUser }) {
     const [files, setFiles] = useState([]);
-    const [isMerging, setIsMerging] = useState(false);
-    const [mergeResult, setMergeResult] = useState(null);
+    const [isConverting, setIsConverting] = useState(false);
+    const [convertedHistory, setConvertedHistory] = useState([]);
+    // 1. Move progress state here so the parent component can monitor it
+    const [progress, setProgress] = useState({});
 
-    const handleMerge = () => {
-        setIsMerging(true);
+    // 2. Determine if the current file is still in the middle of uploading
+    const currentFileId = files[0] ? `${files[0].name}-${files[0].size}` : null;
+    const currentProgress = currentFileId ? (progress[currentFileId] ?? 0) : 0;
+    const isUploading = files.length > 0 && currentProgress < 100;
+
+    const handlePDFtoWord = () => {
+        if (files.length === 0 || isUploading) return;
+        setIsConverting(true);
+
         setTimeout(() => {
-            setMergeResult('Merged PDF created successfully!');
-            setIsMerging(false);
+            const newResult = {
+                id: Date.now(),
+                name: files[0]?.name ? `${files[0].name.replace('.pdf', '')}.docx` : `Converted-Word-${convertedHistory.length + 1}.docx`,
+                time: new Date().toLocaleTimeString(),
+                fileCount: 1,
+            };
+            setConvertedHistory(prev => [newResult, ...prev]);
+            setFiles([]);
+            setProgress({}); // Clear progress tracker cleanly
+            setIsConverting(false);
         }, 2000);
     };
 
     return (
-        <Layout onNavigate={onNavigate} user={user} setUser={setUser}>
-            <div className="max-w-3xl mx-auto flex flex-col gap-6">
+        <div className="max-w-3xl mx-auto flex flex-col gap-6">
+            {/* Header */}
+            <div>
+                <button
+                    onClick={() => onNavigate('dashboard')}
+                    className="text-sm hover:underline text-blue-800 mb-6 flex gap-1 cursor-pointer"
+                >
+                    ← Back to Dashboard
+                </button>
+                <h1 className="text-2xl font-bold text-gray-900">Convert PDF to Word</h1>
+                <p className="text-sm text-gray-500 mt-1">Convert your PDF files to editable Word documents.</p>
+            </div>
 
-                {/* Header */}
-                <div>
+            {/* Upload Zone (Pass progress and setProgress down as props) */}
+            <UploadZone
+                files={files}
+                setFiles={setFiles}
+                progress={progress}
+                setProgress={setProgress}
+            />
+
+            {/* Convert Button */}
+            {files.length > 0 && (
+                <div className="flex justify-center">
                     <button
-                        onClick={() => onNavigate('dashboard')}
-                        className="text-sm hover:underline text-blue-800 mb-6 flex gap-1 cursor-pointer"
+                        onClick={handlePDFtoWord}
+                        // 3. Disable if converting OR if still actively processing upload percentages
+                        disabled={isConverting || isUploading}
+                        className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold px-6 py-3 rounded-xl transition"
                     >
-                        ← Back to Dashboard
+                        {isConverting ? 'Converting...' : isUploading ? 'Waiting for upload...' : 'Convert PDF to Word'}
                     </button>
-                    <h1 className="text-2xl font-bold text-gray-900">Merge PDF Files</h1>
-                    <p className="text-sm text-gray-500 mt-1">Combine multiple PDFs into one file in the order you choose.</p>
                 </div>
+            )}
 
-                {/* Upload Zone */}
-                <UploadZone files={files} setFiles={setFiles} />
-
-                {/* Merge Button */}
-                {files.length > 0 && (
-                    <div className="flex justify-center">
-                        <button
-                            onClick={handleMerge}
-                            disabled={isMerging}
-                            className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold px-6 py-3 rounded-xl transition"
-                        >
-                            {isMerging ? 'Merging...' : 'Merge PDFs'}
-                        </button>
-                    </div>
-                )}
-
-                {/* Result */}
-                {mergeResult && (
-                    <div className="flex flex-col gap-3">
-                        {/* Download link */}
-                        <div className="bg-white border border-gray-200 rounded-xl px-5 py-4 flex items-center justify-between">
+            {/* Converted History */}
+            {convertedHistory.length > 0 && (
+                <div className="flex flex-col gap-3">
+                    <p className="text-sm font-semibold text-gray-700">Converted Files</p>
+                    {convertedHistory.map(result => (
+                        <div key={result.id} className="bg-white border border-gray-200 rounded-xl px-5 py-4 flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
                                     <FileText size={15} className="text-blue-600" />
                                 </div>
                                 <div>
-                                    <p className="text-sm font-medium text-gray-800">merged-output.pdf</p>
-                                    <p className="text-xs text-gray-400">Ready to download</p>
+                                    <p className="text-sm font-medium text-gray-800">{result.name}</p>
+                                    <p className="text-xs text-gray-400">{result.fileCount} file converted · {result.time}</p>
                                 </div>
                             </div>
-                            <button className="bg-blue-500 hover:bg-blue-800 text-white text-sm font-semibold px-2 py-2 rounded-lg transition">
+                            <button className="bg-blue-500 hover:bg-blue-700 text-white text-sm font-semibold px-2 py-2 rounded-lg transition">
                                 <Download size={16} />
                             </button>
                         </div>
-
-                        {/* Success message */}
-                        <div className="bg-green-50 border border-green-200 rounded-xl px-5 py-4 text-green-700 font-medium text-sm">
-                            ✓ {mergeResult}
-                        </div>
+                    ))}
+                    <div className="bg-green-50 border border-green-200 rounded-xl px-5 py-4 text-green-700 font-medium text-sm">
+                        ✓ Converted Word document created successfully!
                     </div>
-                )}
-            </div>
-        </Layout>
+                </div>
+            )}
+        </div>
     );
 }
