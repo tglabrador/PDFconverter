@@ -1,16 +1,45 @@
 import React, { useState } from 'react';
 import { FileText, Mail, Lock, Eye, EyeOff, ArrowRight, Shield, ShieldCheck } from 'lucide-react';
+import { supabase } from './supabase';   // ← ADD THIS
 
 export default function Login({ onNavigate, onLogin }) {
     const [showPassword, setShowPassword] = useState(false);
     const [remember, setRemember] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState(null);       // ← NEW
+    const [loading, setLoading] = useState(false);  // ← NEW
 
-    const handleLogin = (e) => {
+    // ↓ REPLACED: was a fake instant login, now calls Supabase
+    const handleLogin = async (e) => {
         e.preventDefault();
-        onLogin({ name: email.split('@')[0], photo: null });
+        if (!email || !password) {
+            setError('Please enter your email and password.');
+            return;
+        }
+        setLoading(true);
+        setError(null);
+
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+        if (error) {
+            setError(error.message);
+            setLoading(false);
+            return;
+        }
+
+        onLogin(data.user);
         onNavigate('dashboard');
+    };
+
+    // ↓ NEW: Google OAuth login
+    const handleGoogleLogin = async () => {
+        await supabase.auth.signInWithOAuth({ provider: 'google' });
+    };
+
+    // ↓ NEW: Microsoft OAuth login
+    const handleMicrosoftLogin = async () => {
+        await supabase.auth.signInWithOAuth({ provider: 'azure' });
     };
 
     return (
@@ -25,7 +54,7 @@ export default function Login({ onNavigate, onLogin }) {
                     <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
                         <FileText size={18} className="text-white" />
                     </div>
-                    <span className="font-bold text-gray-900 text-lg">DocuShift</span>
+                    <span className="font-bold text-gray-900 text-lg">DeedFlow</span>
                 </div>
                 <nav className="flex items-center gap-6 ml-auto">
                     <a className="text-sm text-gray-600 hover:text-blue-600 cursor-pointer">Pricing</a>
@@ -50,6 +79,13 @@ export default function Login({ onNavigate, onLogin }) {
                     </div>
 
                     <form onSubmit={handleLogin} className="flex flex-col gap-4">
+
+                        {/* ↓ NEW: Error banner — only shows if login fails */}
+                        {error && (
+                            <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-3">
+                                {error}
+                            </div>
+                        )}
 
                         {/* Email */}
                         <div>
@@ -102,12 +138,15 @@ export default function Login({ onNavigate, onLogin }) {
                             />
                             <label htmlFor="remember" className="text-sm text-gray-600 cursor-pointer">Remember this device</label>
                         </div>
-                        {/* Login button */}
+
+                        {/* ↓ CHANGED: button shows loading state */}
                         <button
                             type="submit"
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition mt-1 cursor-pointer">
-                            Login <ArrowRight size={16} />
+                            disabled={loading}
+                            className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition mt-1 cursor-pointer">
+                            {loading ? 'Signing in...' : <> Login <ArrowRight size={16} /> </>}
                         </button>
+
                         {/* Divider */}
                         <div className="flex items-center gap-3 my-1">
                             <div className="flex-1 h-px bg-gray-200" />
@@ -115,10 +154,11 @@ export default function Login({ onNavigate, onLogin }) {
                             <div className="flex-1 h-px bg-gray-200" />
                         </div>
 
-                        {/* Social buttons */}
+                        {/* ↓ CHANGED: social buttons now call Supabase OAuth */}
                         <div className="flex gap-3">
                             <button
                                 type="button"
+                                onClick={handleGoogleLogin}
                                 className="flex-1 flex items-center justify-center gap-2 border border-gray-300 rounded-xl py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer"
                             >
                                 <svg width="16" height="16" viewBox="0 0 24 24">
@@ -131,6 +171,7 @@ export default function Login({ onNavigate, onLogin }) {
                             </button>
                             <button
                                 type="button"
+                                onClick={handleMicrosoftLogin}
                                 className="flex-1 flex items-center justify-center gap-2 border border-gray-300 rounded-xl py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer"
                             >
                                 <svg width="16" height="16" viewBox="0 0 24 24">
