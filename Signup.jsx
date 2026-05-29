@@ -1,20 +1,81 @@
 import React, { useState } from 'react';
 import { FileText, Mail, Lock, Eye, EyeOff, ArrowRight, Shield, ShieldCheck } from 'lucide-react';
+import { supabase } from './supabase';   // ← ADD THIS
 
-export default function Login({ onNavigate, onLogin }) {
+export default function Signup({ onNavigate, onSignup }) {
     const [showPassword, setShowPassword] = useState(false);
-    const [remember, setRemember] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [showToast, setShowToast] = useState(false);
+    const [error, setError] = useState(null);       // ← NEW
+    const [loading, setLoading] = useState(false);  // ← NEW
 
-    const handleLogin = (e) => {
+    // ↓ REPLACED: was fake instant signup, now calls Supabase
+    const handleSignup = async (e) => {
         e.preventDefault();
-        onLogin({ name: email.split('@')[0], email: email, photo: null });
-        onNavigate('dashboard');
+        setError(null);
+
+        if (!email || !password || !confirmPassword) {
+            setError('Please fill in all fields.');
+            return;
+        }
+        if (password !== confirmPassword) {
+            setError('Passwords do not match.');
+            return;
+        }
+        if (password.length < 6) {
+            setError('Password must be at least 6 characters.');
+            return;
+        }
+
+        setLoading(true);
+
+        const { data, error } = await supabase.auth.signUp({ email, password });
+
+        if (error) {
+            setError(error.message);
+            setLoading(false);
+            return;
+        }
+
+        // Show the success toast, then redirect to login
+        // (user needs to confirm email before they can log in)
+        setShowToast(true);
+        setTimeout(() => {
+            setShowToast(false);
+            onNavigate('login');   // ← go to login instead of dashboard (email confirmation required)
+        }, 3000);
+
+        setLoading(false);
+    };
+
+    // ↓ NEW: Google OAuth
+    const handleGoogleSignup = async () => {
+        await supabase.auth.signInWithOAuth({ provider: 'google' });
+    };
+
+    // ↓ NEW: Microsoft OAuth
+    const handleMicrosoftSignup = async () => {
+        await supabase.auth.signInWithOAuth({ provider: 'azure' });
     };
 
     return (
         <div className="min-h-screen bg-[#f0f4ff] flex flex-col">
+
+            {/* ↓ CHANGED: toast message updated to mention email confirmation */}
+            {showToast && (
+                <div className="fixed top-6 right-6 z-50 flex items-center gap-3 bg-white border border-green-200 shadow-lg rounded-2xl px-5 py-4 animate-slide-in">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span className="text-green-600 text-lg">✓</span>
+                    </div>
+                    <div>
+                        <p className="text-sm font-semibold text-gray-800">Account Created!</p>
+                        <p className="text-xs text-gray-500">Check your email to confirm your account.</p>
+                    </div>
+                </div>
+            )}
 
             {/* Topbar */}
             <header className="h-16 bg-white border-b border-gray-500 flex items-center justify-between px-6 gap-6 py-4 pr-10">
@@ -29,8 +90,8 @@ export default function Login({ onNavigate, onLogin }) {
                 </div>
                 <nav className="flex items-center gap-6 ml-auto">
                     <a className="text-sm text-gray-600 hover:text-blue-600 cursor-pointer">Pricing</a>
-                    <a className="text-sm font-semibold text-blue-600 border-b-2 border-blue-600 pb-0.5 cursor-pointer">Login</a>
-                    <button type="button" onClick={() => onNavigate('signup')} className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-1.5 rounded-lg transition cursor-pointer">Sign Up</button>
+                    <a className="text-sm text-gray-600 hover:text-blue-600 cursor-pointer" onClick={() => onNavigate('login')}>Login</a>
+                    <button type="button" onClick={() => onNavigate('signup')} className="bg-blue-600 hover:bg-blue-800 text-white text-sm font-semibold px-4 py-1.5 rounded-lg transition cursor-pointer">Sign Up</button>
                 </nav>
             </header>
 
@@ -45,11 +106,18 @@ export default function Login({ onNavigate, onLogin }) {
                         <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center mb-4 shadow-md shadow-blue-200">
                             <FileText size={26} className="text-white" />
                         </div>
-                        <h1 className="text-2xl font-bold text-gray-900">Welcome back</h1>
+                        <h1 className="text-2xl font-bold text-gray-900">Create an account</h1>
                         <p className="text-sm text-gray-500 mt-1">Secure document processing at your fingertips.</p>
                     </div>
 
-                    <form onSubmit={handleLogin} className="flex flex-col gap-4">
+                    <form onSubmit={handleSignup} className="flex flex-col gap-4">
+
+                        {/* ↓ NEW: Error banner */}
+                        {error && (
+                            <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-3">
+                                {error}
+                            </div>
+                        )}
 
                         {/* Email */}
                         <div>
@@ -70,7 +138,6 @@ export default function Login({ onNavigate, onLogin }) {
                         <div>
                             <div className="flex items-center justify-between mb-1.5">
                                 <label className="text-sm font-medium text-gray-700">Password</label>
-                                <a className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer font-medium">Forgot password?</a>
                             </div>
                             <div className="flex items-center gap-3 border border-gray-300 rounded-xl px-4 py-2.5 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 transition">
                                 <Lock size={16} className="text-gray-400 flex-shrink-0" />
@@ -89,25 +156,36 @@ export default function Login({ onNavigate, onLogin }) {
                                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                                 </button>
                             </div>
+                            <div className="flex items-center justify-between mb-1.5 mt-1">
+                                <label className="text-sm font-medium text-gray-700">Confirm Password</label>
+                            </div>
+                            <div className="flex items-center gap-3 border border-gray-300 rounded-xl px-4 py-2.5 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 transition">
+                                <Lock size={16} className="text-gray-400 flex-shrink-0" />
+                                <input
+                                    type={showConfirmPassword ? 'text' : 'password'}
+                                    placeholder="••••••••"
+                                    value={confirmPassword}
+                                    onChange={e => setConfirmPassword(e.target.value)}
+                                    className="flex-1 text-sm outline-none text-gray-800 placeholder-gray-400 bg-transparent"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                    className="text-gray-400 hover:text-gray-600 transition"
+                                >
+                                    {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                </button>
+                            </div>
                         </div>
 
-                        {/* Remember */}
-                        <div className="flex items-center gap-2">
-                            <input
-                                type="checkbox"
-                                id="remember"
-                                checked={remember}
-                                onChange={e => setRemember(e.target.checked)}
-                                className="w-4 h-4 accent-blue-600 cursor-pointer"
-                            />
-                            <label htmlFor="remember" className="text-sm text-gray-600 cursor-pointer">Remember this device</label>
-                        </div>
-                        {/* Login button */}
+                        {/* ↓ CHANGED: button shows loading state */}
                         <button
                             type="submit"
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition mt-1 cursor-pointer">
-                            Login <ArrowRight size={16} />
+                            disabled={loading}
+                            className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition mt-1 cursor-pointer">
+                            {loading ? 'Creating account...' : <> Sign Up <ArrowRight size={16} /> </>}
                         </button>
+
                         {/* Divider */}
                         <div className="flex items-center gap-3 my-1">
                             <div className="flex-1 h-px bg-gray-200" />
@@ -115,10 +193,11 @@ export default function Login({ onNavigate, onLogin }) {
                             <div className="flex-1 h-px bg-gray-200" />
                         </div>
 
-                        {/* Social buttons */}
+                        {/* ↓ CHANGED: social buttons now call Supabase OAuth */}
                         <div className="flex gap-3">
                             <button
                                 type="button"
+                                onClick={handleGoogleSignup}
                                 className="flex-1 flex items-center justify-center gap-2 border border-gray-300 rounded-xl py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer"
                             >
                                 <svg width="16" height="16" viewBox="0 0 24 24">
@@ -131,6 +210,7 @@ export default function Login({ onNavigate, onLogin }) {
                             </button>
                             <button
                                 type="button"
+                                onClick={handleMicrosoftSignup}
                                 className="flex-1 flex items-center justify-center gap-2 border border-gray-300 rounded-xl py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition cursor-pointer"
                             >
                                 <svg width="16" height="16" viewBox="0 0 24 24">
@@ -143,10 +223,12 @@ export default function Login({ onNavigate, onLogin }) {
                             </button>
                         </div>
 
-                        {/* Sign up link */}
+                        {/* Sign in link */}
                         <p className="text-center text-sm text-gray-500 mt-1">
-                            Don't have an account?{' '}
-                            <a className="text-blue-600 font-semibold hover:text-blue-800 cursor-pointer" onClick={() => onNavigate('signup')}>Sign up</a>
+                            Already have an account?{' '}
+                            <a className="text-blue-600 font-semibold hover:text-blue-800 cursor-pointer" onClick={() => onNavigate('login')}>
+                                Login
+                            </a>
                         </p>
 
                     </form>
@@ -188,7 +270,7 @@ export default function Login({ onNavigate, onLogin }) {
                     </div>
                     <div>
                         <div className="font-bold text-gray-700 text-sm mb-3">Stay Secure</div>
-                        <p className="text-xs text-gray-500 mb-3">© 2024 DocuShift. All rights reserved.</p>
+                        <p className="text-xs text-gray-500 mb-3">© 2024 DeedFlow. All rights reserved.</p>
                     </div>
                 </div>
             </footer>
